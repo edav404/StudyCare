@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 export interface Task {
   id: string;
   title: string;
-  category: 'fisico' | 'mental' | 'academico' | 'otro';
+  category: 'fisico' | 'mental' | 'academico';
   completed: boolean;
 }
 
@@ -25,7 +25,6 @@ export class PgInicio {
     academico: 'blue',
     fisico: 'green',
     mental: 'purple',
-    otro: 'gray',
   };
   //clases dinamicas por categoria
   getClass(category: Task['category']): any {
@@ -50,13 +49,13 @@ export class PgInicio {
   }
 
   //agrupar tasks por categoria
-  get tasksByCategory(): Record<Task['category'], Task[]> {
-    return this.tasks.reduce((acc, task) => {
-      acc[task.category] = acc[task.category] || [];
-      acc[task.category].push(task);
-      return acc;
-    }, {} as Record<Task['category'], Task[]>);
-  }
+get tasksByCategory(): Record<string, Task[]> {
+  return this.tasks.reduce((acc, task) => {
+    acc[task.category] = acc[task.category] || [];
+    acc[task.category].push(task);
+    return acc;
+  }, {} as Record<string, Task[]>);
+}
 
   //calculate overall progress
   getProgressPercent(): number {
