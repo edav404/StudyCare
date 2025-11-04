@@ -19,7 +19,10 @@ export interface Task {
 export class PgInicio {
   protected readonly title = signal('ng-tw-4-app');
   userName = 'Samuel';
-  categories: Task['category'][] = ['academico', 'fisico', 'mental'];
+  readonly categories = ['academico', 'fisico', 'mental'] as const;
+
+  newTaskTitle = '';
+  newTaskCategory: 'academico' | 'fisico' | 'mental' = 'academico';
   //colores por categoria
   categoryColors: Record<Task['category'], string> = {
     academico: 'blue',
@@ -46,16 +49,32 @@ export class PgInicio {
       completed: false,
     };
     this.tasks.push(newTask);
+    this.saveTasksToLocalStorage();
+  }
+  //guardar tasks en localstorage
+  saveTasksToLocalStorage(): void {
+    localStorage.setItem('studycare_tasks', JSON.stringify(this.tasks));
+  }
+  //cargar tasks desde localstorage
+  loadTasksFromLocalStorage(): void {
+    const stored = localStorage.getItem('studycare_tasks');
+    if (stored) {
+      this.tasks = JSON.parse(stored);
+    }
+  }
+  //cargar tasks al iniciar el componente
+  ngOnInit(): void {
+    this.loadTasksFromLocalStorage();
   }
 
   //agrupar tasks por categoria
-get tasksByCategory(): Record<string, Task[]> {
-  return this.tasks.reduce((acc, task) => {
-    acc[task.category] = acc[task.category] || [];
-    acc[task.category].push(task);
-    return acc;
-  }, {} as Record<string, Task[]>);
-}
+  get tasksByCategory(): Record<string, Task[]> {
+    return this.tasks.reduce((acc, task) => {
+      acc[task.category] = acc[task.category] || [];
+      acc[task.category].push(task);
+      return acc;
+    }, {} as Record<string, Task[]>);
+  }
 
   //calculate overall progress
   getProgressPercent(): number {
