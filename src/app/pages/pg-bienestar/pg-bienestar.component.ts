@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HabitCardComponent } from '../../components/habit-card/habit-card.component';
 
 interface Habit {
   id: number;
@@ -13,9 +12,9 @@ interface Habit {
 @Component({
   selector: 'app-pg-bienestar',
   standalone: true,
-  imports: [CommonModule, HabitCardComponent],
+  imports: [CommonModule],
   templateUrl: './pg-bienestar.component.html',
-  styleUrls: ['./pg-bienestar.component.css']
+  styleUrls: []
 })
 export class PgBienestarComponent implements OnInit {
   habits: Habit[] = [];
