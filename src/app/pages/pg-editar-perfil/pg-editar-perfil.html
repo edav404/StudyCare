@@ -1,0 +1,21 @@
+<div class="flex flex-col items-center justify-center min-h-screen bg-yellow-50 p-6">
+  <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-sm">
+    <h2 class="text-2xl font-bold text-center text-yellow-700 mb-4">Editar Perfil</h2>
+
+    <div *ngIf="user; else noUser">
+      <input [(ngModel)]="user.nombre" placeholder="Nombre" class="w-full mb-3 p-2 border rounded-md" />
+      <input [(ngModel)]="user.email" placeholder="Correo electrónico" class="w-full mb-3 p-2 border rounded-md" />
+      <input [(ngModel)]="user.password" placeholder="Contraseña" type="password" class="w-full mb-3 p-2 border rounded-md" />
+
+      <button (click)="guardar()" class="w-full bg-yellow-500 text-white py-2 rounded-md hover:bg-yellow-600 transition">
+        Guardar Cambios
+      </button>
+
+      <p class="text-center text-green-600 mt-3">{{ mensaje }}</p>
+    </div>
+
+    <ng-template #noUser>
+      <p class="text-center text-gray-500">No hay sesión iniciada</p>
+    </ng-template>
+  </div>
+</div>
