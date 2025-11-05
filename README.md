@@ -100,7 +100,7 @@ npm install
 
 ### 3️⃣ Modo desarrollo
 ```bash
-npm install
+npm run build
 ```
 
 ## 🪲 Problemas frecuentes
