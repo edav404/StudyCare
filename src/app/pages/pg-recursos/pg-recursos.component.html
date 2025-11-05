@@ -1,74 +1,136 @@
-<div class="p-6 min-h-screen bg-gray-50">
-  <h1 class="text-2xl font-bold text-blue-700 mb-4">Recursos de Bienestar y Estudio</h1>
-  <p class="text-gray-600 mb-6">
-    Explora meditaciones, técnicas, música y artículos para tu bienestar académico y mental.
-  </p>
-
-  <!-- Filtros -->
-  <div class="filters">
-    <div class="category-chips flex flex-wrap gap-3 mb-4">
-      <div class="flex gap-2 overflow-x-auto pb-2">
-        <span class="font-semibold text-gray-700 mr-2">Categoría:</span>
-        <button
-          *ngFor="let cat of categories"
-          (click)="filterByCategory(cat)"
-          [class.active]="activeCategory === cat"
-          class="category-chip border border-blue-500 text-blue-600 px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-100 whitespace-nowrap transition"
-        >
-          {{ cat }}
-        </button>
-      </div>
+<div class="min-h-[94vh] flex bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
+  <!-- 🔹 Sidebar fijo sin scroll -->
+  <aside
+    class="w-64 bg-white shadow-lg md:flex flex-col justify-between hidden z-30"
+  >
+    <div class="py-6">
+      <nav>
+        <ul class="flex flex-col justify-around w-full px-4 gap-3">
+          <li
+            *ngFor="let item of navItems"
+            class="flex-1 text-center border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:scale-[0.97] transition-all duration-300"
+          >
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="flex flex-col items-center py-3 text-gray-600 text-sm font-medium hover:text-blue-600 transition"
+            >
+              <span
+                class="text-2xl mb-1 transition-transform duration-200"
+                [ngClass]="{ 'scale-110 text-blue-600': isActive(item.path) }"
+              >
+                {{ item.icon }}
+              </span>
+              <span
+                [ngClass]="{
+                  'text-blue-600 font-semibold': isActive(item.path),
+                  'text-gray-500': !isActive(item.path)
+                }"
+              >
+                {{ item.label }}
+              </span>
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
 
-    <div class="type-chips flex flex-wrap gap-3 mb-6">
-      <div class="flex gap-2 overflow-x-auto pb-2">
-        <span class="font-semibold text-gray-700 mr-2">Tipo:</span>
-        <button
-          *ngFor="let t of types"
-          (click)="filterByType(t)"
-          [class.active]="activeType === t"
-          class="type-chip border border-green-500 text-green-600 px-4 py-1 rounded-full text-sm font-semibold hover:bg-green-100 whitespace-nowrap transition"
-        >
-          {{ t | titlecase }}
-        </button>
-      </div>
+    <div class="p-5 text-center border-t border-gray-100 text-gray-400 text-xs">
+      © 2025 StudyCare
     </div>
-  </div>
+  </aside>
 
-  <!-- Lista de recursos -->
-  <!-- Estado: cargando / error / vacío -->
-  <div *ngIf="loading" class="py-8 text-center text-gray-600">Cargando recursos...</div>
+  <!-- 🔹 Contenido principal con scroll -->
+  <main
+    class="flex-1 p-6 md:p-10 overflow-y-auto max-h-[94vh] scroll-smooth"
+  >
+    <header class="mb-10">
+      <h1 class="text-3xl font-extrabold text-blue-700 mb-2">Recursos de Bienestar y Estudio</h1>
+      <p class="text-gray-600 text-sm md:text-base">
+        Explora meditaciones, técnicas, música y artículos para tu bienestar académico y mental.
+      </p>
+    </header>
 
-  <div *ngIf="!loading && errorMessage" class="py-8 text-center text-red-600">
-    <p>{{ errorMessage }}</p>
-    <button (click)="loadResources()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded">Reintentar</button>
-  </div>
-
-  <div *ngIf="!loading && !errorMessage && filtered.length === 0" class="py-8 text-center text-gray-600">No hay recursos para mostrar.</div>
-
-  <div *ngIf="!loading && !errorMessage && filtered.length > 0" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div
-      *ngFor="let res of filtered"
-      class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
-    >
-      <img [src]="res.thumbnail" alt="" class="w-full h-40 object-cover">
-      <div class="p-4">
-        <div class="flex justify-between items-start">
-          <h2 class="text-lg font-semibold text-gray-800 mb-1">{{ res.title }}</h2>
-          <button class="favorite-btn" (click)="toggleFavorite(res)" aria-label="Marcar favorito">
-            <span [class.active]="res.favorite">{{ res.favorite ? '★' : '☆' }}</span>
-          </button>
+    <!-- 🔹 Filtros -->
+    <section class="bg-white/60 backdrop-blur-md rounded-xl shadow-sm p-3 mb-6 border border-gray-100">
+      <div class="flex flex-wrap gap-3 items-center">
+        <div class="flex items-center gap-2">
+          <label for="category" class="text-sm font-medium text-gray-600">Categoría:</label>
+          <select
+            id="category"
+            [(ngModel)]="activeCategory"
+            (change)="filterByCategory(activeCategory)"
+            class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+          >
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
         </div>
 
-        <p class="text-gray-500 text-sm mb-3">{{ res.description }}</p>
-        <a
-          [href]="res.url"
-          target="_blank"
-          class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg"
-        >
-          Ver {{ res.type === 'video' ? 'video ▶️' : res.type === 'article' ? 'artículo 📖' : 'guía 🎧' }}
-        </a>
+        <div class="flex items-center gap-2">
+          <label for="type" class="text-sm font-medium text-gray-600">Tipo:</label>
+          <select
+            id="type"
+            [(ngModel)]="activeType"
+            (change)="filterByType(activeType)"
+            class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
+          >
+            <option *ngFor="let t of types" [value]="t">{{ t | titlecase }}</option>
+          </select>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
+
+    <!-- 🔹 Contenido -->
+    <section>
+      <div *ngIf="loading" class="py-8 text-center text-gray-600 animate-pulse">
+        Cargando recursos...
+      </div>
+
+      <div *ngIf="!loading && errorMessage" class="py-8 text-center text-red-600">
+        <p>{{ errorMessage }}</p>
+        <button
+          (click)="loadResources()"
+          class="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+        >
+          Reintentar
+        </button>
+      </div>
+
+      <div *ngIf="!loading && !errorMessage && filtered.length === 0" class="py-8 text-center text-gray-600">
+        No hay recursos para mostrar.
+      </div>
+
+      <div *ngIf="!loading && !errorMessage && filtered.length > 0" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          *ngFor="let res of filtered"
+          class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100"
+        >
+          <img [src]="res.thumbnail" alt="" class="w-full h-44 object-cover">
+          <div class="p-5">
+            <div class="flex justify-between items-start mb-2">
+              <h2 class="text-lg font-semibold text-gray-800 leading-snug">{{ res.title }}</h2>
+              <button
+                (click)="toggleFavorite(res)"
+                class="text-xl text-yellow-400 hover:scale-110 transition-transform"
+                aria-label="Marcar favorito"
+              >
+                <span [class.opacity-50]="!res.favorite">{{ res.favorite ? '★' : '☆' }}</span>
+              </button>
+            </div>
+
+            <p class="text-gray-500 text-sm mb-4">{{ res.description }}</p>
+
+            <a
+              [href]="res.url"
+              target="_blank"
+              class="inline-flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-xl transition"
+            >
+              {{ res.type === 'video' ? 'Ver video ▶️' : res.type === 'article' ? 'Leer artículo 📖' : 'Escuchar guía 🎧' }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>

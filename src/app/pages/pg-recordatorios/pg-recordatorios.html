@@ -1,0 +1,158 @@
+<div class="min-h-[94vh] flex bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
+  <!-- 🔹 Sidebar fijo sin scroll -->
+  <aside class="w-64 bg-white shadow-lg md:flex flex-col justify-between hidden z-30">
+    <div class="py-6">
+      <nav>
+        <ul class="flex flex-col justify-around w-full px-4 gap-3">
+          <li
+            *ngFor="let item of navItems"
+            class="flex-1 text-center border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:scale-[0.97] transition-all duration-300"
+          >
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="flex flex-col items-center py-3 text-gray-600 text-sm font-medium hover:text-blue-600 transition"
+            >
+              <span
+                class="text-2xl mb-1 transition-transform duration-200"
+                [ngClass]="{ 'scale-110 text-blue-600': isActive(item.path) }"
+              >
+                {{ item.icon }}
+              </span>
+              <span
+                [ngClass]="{
+                  'text-blue-600 font-semibold': isActive(item.path),
+                  'text-gray-500': !isActive(item.path)
+                }"
+              >
+                {{ item.label }}
+              </span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="p-5 text-center border-t border-gray-100 text-gray-400 text-xs">
+      © 2025 StudyCare
+    </div>
+  </aside>
+
+  <!-- 🔹 Contenido principal con scroll -->
+  <main class="flex-1 p-6 md:p-10 overflow-y-auto max-h-[94vh] scroll-smooth">
+    <header class="mb-10">
+      <h1 class="text-3xl font-extrabold text-blue-700 mb-2">Recordatorio de postura</h1>
+      <p class="text-gray-600 text-sm md:text-base">
+        Configura tus intervalos y recibe notificaciones para mantener una postura saludable mientras estudias.
+      </p>
+    </header>
+
+    <!-- Panel de configuración -->
+    <section class="bg-white/60 backdrop-blur-md rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
+      <div class="grid sm:grid-cols-3 gap-4 items-end">
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1">Intervalo (min)</label>
+          <input
+            type="number"
+            [(ngModel)]="interval"
+            min="1"
+            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+          />
+        </div>
+
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1">Hora inicio</label>
+          <input
+            type="time"
+            [(ngModel)]="startTime"
+            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+          />
+        </div>
+
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1">Hora fin</label>
+          <input
+            type="time"
+            [(ngModel)]="endTime"
+            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+          />
+        </div>
+      </div>
+
+      <div class="mt-4 grid sm:grid-cols-2 gap-4 items-start">
+        <div>
+          <label class="text-sm font-medium text-gray-700 block mb-1">Días activos</label>
+          <select
+            multiple
+            [(ngModel)]="selectedDays"
+            class="w-full border rounded-lg p-2 h-32 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+          >
+            <option [ngValue]="1">Lunes</option>
+            <option [ngValue]="2">Martes</option>
+            <option [ngValue]="3">Miércoles</option>
+            <option [ngValue]="4">Jueves</option>
+            <option [ngValue]="5">Viernes</option>
+            <option [ngValue]="6">Sábado</option>
+            <option [ngValue]="0">Domingo</option>
+          </select>
+          <small class="text-gray-500">Selecciona varios con Ctrl/Cmd + clic</small>
+        </div>
+
+        <div>
+          <label class="inline-flex items-center gap-2 mt-1">
+            <input type="checkbox" [(ngModel)]="enableSound" class="form-checkbox" />
+            <span class="text-sm text-gray-700">Activar sonido con la notificación</span>
+          </label>
+
+          <div class="mt-4 flex gap-3 flex-wrap">
+            <button
+              (click)="onSaveClick()"
+              class="bg-blue-600 text-white px-4 py-2 rounded-xl shadow hover:bg-blue-700 transition"
+            >
+              Guardar y activar
+            </button>
+            <button
+              (click)="onStopClick()"
+              class="bg-red-500 text-white px-4 py-2 rounded-xl shadow hover:bg-red-600 transition"
+            >
+              Detener
+            </button>
+            <button
+              (click)="onTestClick()"
+              class="bg-emerald-600 text-white px-4 py-2 rounded-xl shadow hover:bg-emerald-700 transition"
+            >
+              Probar notificación
+            </button>
+          </div>
+
+          <p class="mt-3 text-sm text-gray-500">
+            Nota: las notificaciones funcionan mejor con permisos concedidos y (opcionalmente) un Service Worker
+            registrado.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Consejos -->
+    <section class="bg-white/60 backdrop-blur-md rounded-xl shadow-sm p-6 mb-6 border border-gray-100">
+      <h3 class="font-semibold text-gray-800 mb-3">Consejos rápidos (ergonomía)</h3>
+      <ul class="list-disc pl-5 text-gray-700 space-y-2">
+        <li *ngFor="let tip of tipsToShow">{{ tip }}</li>
+      </ul>
+
+      <div class="mt-4 flex justify-end">
+        <button (click)="shuffleTips()" class="text-sm text-blue-600 hover:underline">Mostrar otros</button>
+      </div>
+    </section>
+
+    <!-- Logs -->
+    <section class="bg-white/60 backdrop-blur-md rounded-xl shadow-sm p-6 border border-gray-100">
+      <h3 class="font-semibold text-gray-800 mb-3">Registro / Logs</h3>
+      <div class="bg-gray-50 border border-gray-100 rounded p-3 h-40 overflow-auto text-sm text-gray-700">
+        <div *ngIf="logLines.length === 0" class="text-gray-500">Sin actividad aún.</div>
+        <div *ngFor="let l of logLines">{{ l }}</div>
+      </div>
+    </section>
+  </main>
+</div>

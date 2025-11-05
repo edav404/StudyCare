@@ -1,130 +1,185 @@
-<main>
-  <div class="p-6">
-    <h1 class="text-3xl font-bold text-blue-700">¡Hola, {{ userName }}!</h1>
-    <p class="text-lg font-semibold text-gray-600 mt-2">¿Listo para equilibrar tu día?</p>
-  </div>
-
-  <!-- Card de progreso -->
-  <div
-    class="bg-white rounded-xl shadow-xl hover:shadow-2xl transition-shadow shadow-blue-400 p-6 mx-auto max-w-sm"
+<main class="flex min-h-[94vh] bg-gray-50">
+  <!-- Sidebar -->
+  <aside
+    class="w-64 bg-white shadow-lg md:flex flex-col justify-between hidden z-30"
   >
-    <div class="text-center mt-4">
-      <div class="relative w-40 h-40 mx-auto mt-4">
-        <svg class="absolute top-0 left-0" viewBox="0 0 100 100">
-          <circle
-            cx="50"
-            cy="50"
-            r="45"
-            stroke="#e5e7eb"
-            stroke-width="10"
-            fill="none"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r="45"
-            stroke="#3b82f6"
-            stroke-width="10"
-            fill="none"
-            stroke-dasharray="282.6"
-            [attr.stroke-dashoffset]="282.6 - (progressPercent / 100) * 282.6"
-            stroke-linecap="round"
-            transform="rotate(-90 50 50)"
-          />
-        </svg>
-
-        <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <span class="text-2xl font-bold text-gray-800">{{ progressPercent }}%</span>
-          <span class="text-sm text-gray-500">Tu Progreso Diario</span>
-        </div>
-      </div>
-
-      <p class="mt-3 text-gray-500 font-medium">{{ getProgressMessage() }}</p>
-    </div>
-  </div>
-
-  <div class="bg-white shadow-md rounded-lg p-6 max-w-md mx-auto mt-8">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">
-      Agrega una nueva tarea
-    </h2>
-
-    <form
-      (ngSubmit)="addTask(newTaskTitle, newTaskCategory)"
-      class="flex flex-col gap-4"
-    >
-      <input
-        [(ngModel)]="newTaskTitle"
-        name="title"
-        placeholder="Escribe tu tarea..."
-        class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        required
-      />
-
-      <select
-        [(ngModel)]="newTaskCategory"
-        name="category"
-        class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-        <option value="academico">Académico</option>
-        <option value="fisico">Físico</option>
-        <option value="mental">Mental</option>
-      </select>
-
-      <button
-        type="submit"
-        class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-md transition duration-200"
-      >
-        Agregar tarea
-      </button>
-    </form>
-  </div>
-
-    <!-- Tarjeta de acceso rápido a Pomodoro -->
-  <div class="max-w-md mx-auto my-4">
-    <a routerLink="/pomodoro" class="group block bg-white rounded-xl shadow-md p-4 flex items-center gap-4 hover:shadow-2xl transform hover:-translate-y-1 transition">
-      <div class="w-12 h-12 flex items-center justify-center bg-blue-50 rounded-lg text-2xl">🕒</div>
-      <div>
-        <div class="text-sm text-gray-500">Modo</div>
-        <div class="text-lg font-semibold text-gray-800">Reloj Pomodoro</div>
-        <div class="text-xs text-gray-500 mt-1">25 min enfocado • 5 min descanso</div>
-      </div>
-      <div class="ml-auto text-sm text-blue-600 group-hover:underline">Abrir</div>
-    </a>
-  </div>
-
-  <!-- Lista de tareas por categoría -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 px-6 mb-6">
-    <div *ngFor="let category of categories">
-      <div class="rounded-lg p-4 shadow-md" [ngClass]="getClass(category)">
-        <h3 class="text-lg font-bold mb-2 text-center">{{ category | titlecase }}</h3>
-
-        <div
-          *ngIf="tasksByCategory[category]?.length; else emptyCategory"
-          class="space-y-2"
-        >
-          <label
-            *ngFor="let task of tasksByCategory[category]"
-            class="flex items-center gap-2 bg-white rounded px-3 py-2 shadow-sm"
+    <div class="py-6">
+      <nav>
+        <ul class="flex flex-col justify-around w-full px-4 gap-3">
+          <li
+            *ngFor="let item of navItems"
+            class="flex-1 text-center border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:scale-[0.97] transition-all duration-300"
           >
-            <input
-              type="checkbox"
-              [(ngModel)]="task.completed"
-              (change)="saveTasksToLocalStorage()"
-              class="w-4 h-4 text-blue-500 focus:ring-blue-400"
-            />
-            <span
-              [class.line-through]="task.completed"
-              class="text-gray-800"
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="flex flex-col items-center py-3 text-gray-600 text-sm font-medium hover:text-blue-600 transition"
             >
-              {{ task.title }}
-            </span>
-          </label>
-        </div>
+              <span
+                class="text-2xl mb-1 transition-transform duration-200"
+                [ngClass]="{ 'scale-110 text-blue-600': isActive(item.path) }"
+              >
+                {{ item.icon }}
+              </span>
+              <span
+                [ngClass]="{
+                  'text-blue-600 font-semibold': isActive(item.path),
+                  'text-gray-500': !isActive(item.path)
+                }"
+              >
+                {{ item.label }}
+              </span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
 
-        <ng-template #emptyCategory>
-          <p class="text-gray-500 text-center italic">Sin tareas</p>
-        </ng-template>
+    <div class="p-5 text-center border-t border-gray-100 text-gray-400 text-xs">
+      © 2025 StudyCare
+    </div>
+  </aside>
+
+  <!-- Contenido principal -->
+  <section class="flex-1 p-8">
+    <!-- Encabezado -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-blue-700">¡Hola, {{ userName }}!</h1>
+        <p class="text-gray-500 text-sm mt-1">
+          Tu espacio personal de equilibrio y productividad 🌱
+        </p>
       </div>
     </div>
-  </div>
+
+    <!-- Grid principal -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Progreso Diario -->
+      <div
+        class="bg-white rounded-xl shadow p-6 flex flex-col justify-center items-center"
+      >
+        <div class="relative w-36 h-36 mb-4">
+          <svg class="absolute top-0 left-0" viewBox="0 0 100 100">
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              stroke="#e5e7eb"
+              stroke-width="10"
+              fill="none"
+            />
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              stroke="#3b82f6"
+              stroke-width="10"
+              fill="none"
+              stroke-dasharray="282.6"
+              [attr.stroke-dashoffset]="282.6 - (progressPercent / 100) * 282.6"
+              stroke-linecap="round"
+              transform="rotate(-90 50 50)"
+            />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-2xl font-bold text-gray-800">{{ progressPercent }}%</span>
+            <span class="text-sm text-gray-500">Progreso Diario</span>
+          </div>
+        </div>
+        <p class="text-gray-600 text-sm font-medium text-center">
+          {{ getProgressMessage() }}
+        </p>
+      </div>
+
+      <!-- Agregar tarea -->
+      <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 text-center">
+          Agrega una nueva tarea
+        </h2>
+        <form
+          (ngSubmit)="addTask(newTaskTitle, newTaskCategory)"
+          class="flex flex-col gap-4"
+        >
+          <input
+            [(ngModel)]="newTaskTitle"
+            name="title"
+            placeholder="Escribe tu tarea..."
+            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
+          <select
+            [(ngModel)]="newTaskCategory"
+            name="category"
+            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="academico">Académico</option>
+            <option value="fisico">Físico</option>
+            <option value="mental">Mental</option>
+          </select>
+          <button
+            type="submit"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-md transition duration-200"
+          >
+            Agregar tarea
+          </button>
+        </form>
+      </div>
+
+      <!-- Acceso rápido -->
+      <a
+        routerLink="/pomodoro"
+        class="bg-linear-to-r from-blue-500 to-blue-700 text-white rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition p-6 flex flex-col justify-center items-center text-center"
+      >
+        <div class="text-4xl mb-3">🕒</div>
+        <h3 class="text-xl font-semibold">Modo Pomodoro</h3>
+        <p class="text-sm mt-1 text-blue-100">
+          25 min de enfoque, 5 min de descanso
+        </p>
+      </a>
+    </div>
+
+    <!-- Lista de tareas -->
+    <div class="mt-8">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">
+        Tus tareas por categoría
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div *ngFor="let category of categories">
+          <div class="bg-white rounded-xl shadow p-4">
+            <h3 class="text-lg font-bold mb-3 text-blue-700 text-center">
+              {{ category | titlecase }}
+            </h3>
+
+            <div
+              *ngIf="tasksByCategory[category]?.length; else emptyCategory"
+              class="space-y-2"
+            >
+              <label
+                *ngFor="let task of tasksByCategory[category]"
+                class="flex items-center gap-2 bg-gray-50 rounded px-3 py-2"
+              >
+                <input
+                  type="checkbox"
+                  [(ngModel)]="task.completed"
+                  (change)="saveTasksToLocalStorage()"
+                  class="w-4 h-4 text-blue-500 focus:ring-blue-400"
+                />
+                <span
+                  [class.line-through]="task.completed"
+                  class="text-gray-800"
+                >
+                  {{ task.title }}
+                </span>
+              </label>
+            </div>
+
+            <ng-template #emptyCategory>
+              <p class="text-gray-500 text-center italic">Sin tareas</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>

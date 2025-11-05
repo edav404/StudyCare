@@ -12,14 +12,16 @@ import { UserService } from '../../services/user.service';
   styleUrl: './pg-login.css',
 })
 export class PgLogin {
-  correo: string = '';
-  password: string = '';
-  mensaje: string = '';
-  error: boolean = false;
-
+  correo = '';
+  password = '';
+  mostrarModal = false;
+  mensajeTitulo = '';
+  mensaje = '';
+  error = false;
   constructor(private userService: UserService, private router: Router) {}
 
   iniciarSesion() {
+    this.mostrarModal = true;
     if (!this.correo || !this.password) {
       this.mensaje = 'Por favor, ingrese su correo y contraseña.';
       this.error = true;
@@ -28,13 +30,26 @@ export class PgLogin {
 
     const logged = this.userService.login(this.correo, this.password);
 
-    if (logged) {
-      this.mensaje = 'Inicio de sesión exitoso ✅';
-      this.error = false;
-      setTimeout(() => this.router.navigate(['/inicio']), 1000);
-    } else {
-      this.mensaje = 'Correo o contraseña incorrectos, o usuario inactivo.';
-      this.error = true;
-    }
+    this.error = false;
+    this.mensajeTitulo = 'Verificando credenciales...';
+    this.mensaje = 'Por favor espera mientras validamos tu sesión.';
+
+
+    // Simulación asincrónica
+    setTimeout(() => {
+      if (logged) {
+        this.mensajeTitulo = 'Inicio de sesión exitoso';
+        this.mensaje = '¡Bienvenido de nuevo!';
+        this.router.navigate(['/inicio'])
+      } else {
+        this.error = true;
+        this.mensajeTitulo = 'Error de inicio de sesión';
+        this.mensaje = 'Correo o contraseña incorrectos.';
+      }
+    }, 1500);
+  }
+
+  cerrarModal() {
+    this.mostrarModal = false;
   }
 }
