@@ -13,6 +13,9 @@ export const routes: Routes = [
   { path: 'editar-perfil', component: PgEditarPerfil },
   { path: 'estados-animo', component: PgEstadosAnimo },
   { path: 'bienestar', component: PgBienestarComponent },
+  { path: 'pomodoro',
+    loadComponent: () => import('./pages/pg-pomodoro/pg-pomodoro.component').then(m => m.PgPomodoroComponent)
+  },
   { path: 'recursos',
     loadComponent: () =>
       import('./pages/pg-recursos/pg-recursos.component').then((m) => m.PgRecursosComponent), },

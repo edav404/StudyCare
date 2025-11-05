@@ -1,0 +1,34 @@
+:root {
+  --card-bg: #ffffff;
+}
+
+.pomodoro-root {
+  background: #f8fafc;
+}
+
+.card {
+  border-radius: 14px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.progress-ring svg {
+  display: block;
+}
+
+.time {
+  color: #111827;
+}
+
+.controls .btn {
+  min-width: 90px;
+}
+
+.btn:active { transform: scale(0.98); }
+
+.ergonomics { font-style: italic; }

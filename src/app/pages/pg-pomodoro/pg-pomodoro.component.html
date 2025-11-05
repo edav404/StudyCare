@@ -1,0 +1,51 @@
+<div class="pomodoro-root p-6 min-h-screen flex flex-col items-center justify-start bg-gray-50">
+  <h1 class="text-2xl font-bold text-blue-700 mb-4">Pomodoro • Estudia con foco</h1>
+
+  <div class="card bg-white rounded-2xl shadow-md p-6 w-full max-w-md">
+    <div class="flex items-center justify-between mb-4">
+      <div class="status flex items-center gap-3">
+        <span class="status-dot" [style.background]="modeColor"></span>
+        <div>
+          <div class="text-sm text-gray-500">Estado</div>
+          <div class="font-semibold">{{ modeLabel }}</div>
+        </div>
+      </div>
+      <div class="cycles text-right">
+        <div class="text-sm text-gray-500">Ciclos</div>
+        <div class="font-semibold">{{ cyclesCompleted }}</div>
+      </div>
+    </div>
+
+    <div class="timer-area flex flex-col items-center gap-4">
+      <div class="progress-ring">
+        <svg viewBox="0 0 120 120" class="w-48 h-48">
+          <circle cx="60" cy="60" r="50" stroke="#e5e7eb" stroke-width="10" fill="none"></circle>
+          <circle
+            cx="60"
+            cy="60"
+            r="50"
+            [attr.stroke]="modeColor"
+            stroke-width="10"
+            fill="none"
+            stroke-linecap="round"
+            [attr.stroke-dasharray]="314.1592653589793"
+            [attr.stroke-dashoffset]="314.1592653589793 * (1 - progressPct / 100)"
+            transform="rotate(-90 60 60)"
+          ></circle>
+        </svg>
+      </div>
+
+      <div class="time text-4xl font-mono font-bold">{{ minutes }}:{{ seconds }}</div>
+      <div class="ergonomics text-sm text-gray-500">Recuerda: espalda recta y respiración 4-4-4</div>
+    </div>
+
+    <div class="controls mt-6 flex gap-3 justify-center">
+      <button class="btn bg-blue-600 text-white px-4 py-2 rounded" (click)="start()">Iniciar</button>
+      <button class="btn bg-gray-200 text-gray-800 px-4 py-2 rounded" (click)="pause()">Pausar</button>
+      <button class="btn bg-gray-200 text-gray-800 px-4 py-2 rounded" (click)="reset()">Reiniciar</button>
+  <button class="btn bg-green-500 text-white px-3 py-2 rounded" (click)="toggleMode()">{{ mode === 'study' ? 'Modo descanso' : 'Volver a estudio' }}</button>
+    </div>
+
+    <div class="note mt-4 text-xs text-gray-500 text-center">El temporizador se mantiene aunque navegues por la app.</div>
+  </div>
+</div>
