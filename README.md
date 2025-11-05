@@ -11,7 +11,6 @@ Incluye módulos de **Pomodoro**, **hábitos saludables**, **recursos de relajac
 - **Lenguaje:** TypeScript  
 - **Estilos:** TailwindCSS (PostCSS)  
 - **Datos locales:** LocalStorage  
-- **Testing:** Karma + Jasmine  
 
 ---
 
@@ -20,20 +19,20 @@ Incluye módulos de **Pomodoro**, **hábitos saludables**, **recursos de relajac
 ```
 src/
 ├── app/
-│ ├── app.ts # Componente raíz (standalone)
-│ ├── app.routes.ts # Definición de rutas
-│ ├── app.config.ts # Providers globales
+│ ├── app.ts                    # Componente raíz (standalone)
+│ ├── app.routes.ts             # Definición de rutas
+│ ├── app.config.ts             # Providers globales
 │ └── pages/
-│ ├── pg-login/ # Login y registro de usuario
-│ ├── pg-inicio/ # Dashboard principal
-│ ├── pg-bienestar/ # Hábitos saludables (CRUD local)
-│ ├── pg-estados-animo/ # Registro de estados emocionales
-│ ├── pg-recursos/ # Recursos curados (filtros y favoritos)
-│ ├── pg-pomodoro/ # Reloj Pomodoro
-│ ├── navbar/ # Header principal
-│ └── navbar-bottom/ # Barra de navegación inferior
-├── assets/data/recursos.json # Datos locales de recursos
-├── styles.css # Estilos globales y Tailwind
+│ ├── pg-login/                 # Login y registro de usuario
+│ ├── pg-inicio/                # Dashboard principal
+│ ├── pg-bienestar/             # Hábitos saludables (CRUD local)
+│ ├── pg-estados-animo/         # Registro de estados emocionales
+│ ├── pg-recursos/              # Recursos curados (filtros y favoritos)
+│ ├── pg-pomodoro/              # Reloj Pomodoro
+│ ├── navbar/                   # Header principal
+│ └── navbar-bottom/            # Barra de navegación inferior
+├── assets/data/recursos.json   # Datos locales de recursos
+├── styles.css                  # Estilos globales y Tailwind
 ```
 
 ---
