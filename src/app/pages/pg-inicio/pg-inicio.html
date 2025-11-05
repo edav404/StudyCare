@@ -1,16 +1,24 @@
 <main>
   <div class="p-6">
     <h1 class="text-3xl font-bold text-blue-700">¡Hola, {{ userName }}!</h1>
+    <p class="text-lg font-semibold text-gray-600 mt-2">¿Listo para equilibrar tu día?</p>
   </div>
+
+  <!-- Card de progreso -->
   <div
     class="bg-white rounded-xl shadow-xl hover:shadow-2xl transition-shadow shadow-blue-400 p-6 mx-auto max-w-sm"
   >
-    <div class="text-center mt-8">
-      <p class="text-lg font-bold text-gray-500 mt-1">¿Listo para equilibrar tu día?</p>
-
-      <div class="relative w-40 h-40 mx-auto mt-6">
+    <div class="text-center mt-4">
+      <div class="relative w-40 h-40 mx-auto mt-4">
         <svg class="absolute top-0 left-0" viewBox="0 0 100 100">
-          <!-- Fondo gris -->
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            stroke="#e5e7eb"
+            stroke-width="10"
+            fill="none"
+          />
           <circle
             cx="50"
             cy="50"
@@ -24,53 +32,85 @@
             transform="rotate(-90 50 50)"
           />
         </svg>
-        <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <span class="text-xl font-bold text-gray-800">{{ progressPercent }}%</span>
 
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="text-2xl font-bold text-gray-800">{{ progressPercent }}%</span>
           <span class="text-sm text-gray-500">Tu Progreso Diario</span>
         </div>
       </div>
 
-      <p class="mt-2 text-gray-500 font-medium">{{ getProgressMessage() }}</p>
+      <p class="mt-3 text-gray-500 font-medium">{{ getProgressMessage() }}</p>
     </div>
   </div>
-  <!-- Formulario de tareas -->
-  <div class="bg-white shadow-md rounded-lg p-6 max-w-md mx-auto mt-6">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Agrega una nueva tarea</h2>
 
-    <form (ngSubmit)="addTask(newTaskTitle, newTaskCategory)" class="flex flex-col gap-4">
+  <div class="bg-white shadow-md rounded-lg p-6 max-w-md mx-auto mt-8">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">
+      Agrega una nueva tarea
+    </h2>
+
+    <form
+      (ngSubmit)="addTask(newTaskTitle, newTaskCategory)"
+      class="flex flex-col gap-4"
+    >
       <input
         [(ngModel)]="newTaskTitle"
         name="title"
-        placeholder="Nueva tarea"
-        class="border rounded px-2 py-1"
+        placeholder="Escribe tu tarea..."
+        class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        required
       />
 
-      <select [(ngModel)]="newTaskCategory" name="category" class="border rounded px-2 py-1">
+      <select
+        [(ngModel)]="newTaskCategory"
+        name="category"
+        class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
         <option value="academico">Académico</option>
         <option value="fisico">Físico</option>
         <option value="mental">Mental</option>
       </select>
 
-      <button type="submit" class="bg-blue-500 text-white px-4 py-1 rounded">Agregar</button>
+      <button
+        type="submit"
+        class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 rounded-md transition duration-200"
+      >
+        Agregar tarea
+      </button>
     </form>
   </div>
 
   <!-- Lista de tareas por categoría -->
-  <div class="grid grid-cols-3 gap-4 mt-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 px-6 mb-6">
     <div *ngFor="let category of categories">
       <div class="rounded-lg p-4 shadow-md" [ngClass]="getClass(category)">
-        <h3 class="text-lg font-bold mb-2">{{ category | titlecase }}</h3>
-        <div *ngFor="let task of tasksByCategory[category]">
-          <label class="flex items-center gap-2">
+        <h3 class="text-lg font-bold mb-2 text-center">{{ category | titlecase }}</h3>
+
+        <div
+          *ngIf="tasksByCategory[category]?.length; else emptyCategory"
+          class="space-y-2"
+        >
+          <label
+            *ngFor="let task of tasksByCategory[category]"
+            class="flex items-center gap-2 bg-white rounded px-3 py-2 shadow-sm"
+          >
             <input
               type="checkbox"
               [(ngModel)]="task.completed"
               (change)="saveTasksToLocalStorage()"
+              class="w-4 h-4 text-blue-500 focus:ring-blue-400"
             />
-            <span>{{ task.title }}</span>
+            <span
+              [class.line-through]="task.completed"
+              class="text-gray-800"
+            >
+              {{ task.title }}
+            </span>
           </label>
         </div>
+
+        <ng-template #emptyCategory>
+          <p class="text-gray-500 text-center italic">Sin tareas</p>
+        </ng-template>
       </div>
     </div>
   </div>
