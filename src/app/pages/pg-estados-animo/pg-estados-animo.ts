@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Navbar } from '../navbar/navbar';
+// Navbar intentionally not imported here (the app root provides it)
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
 
 interface Tip {
   iconPath: string;
@@ -13,12 +15,25 @@ type Mood = 'Terrible' | 'Mal' | 'Normal' | 'Bien' | 'Genial';
 
 @Component({
   selector: 'app-pg-estados-animo',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './pg-estados-animo.html',
-  styleUrl: './pg-estados-animo.css',
+  styleUrls: ['./pg-estados-animo.css'],
 })
-export class PgEstadosAnimo {
-  userName = 'Samuel'; // o pásalo como input si lo tienes global
+export class PgEstadosAnimo implements OnInit {
+  userName = '';
+
+  constructor(private userService: UserService, private router: Router) {}
+
+  ngOnInit(): void {
+    const user = this.userService.getCurrentUser();
+    if (user) {
+      this.userName = user.nombre;
+    } else {
+      // Si no hay usuario, redirigimos al login
+      this.router.navigate(['/login']);
+    }
+  }
   // Lista de estados de ánimo
   moods: { label: Mood; icon: string }[] = [
     { label: 'Terrible', icon: '😣' },

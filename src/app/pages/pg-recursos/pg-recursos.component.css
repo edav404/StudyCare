@@ -1,0 +1,46 @@
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* Favorito */
+.favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 22px;
+  transition: transform 0.2s ease;
+}
+
+.favorite-btn span {
+  color: #cbd5e1;
+}
+
+.favorite-btn span.active {
+  color: #facc15; /* amarillo estrella */
+  transform: scale(1.2);
+}
+
+.filters {
+  margin-bottom: 1rem;
+}
+
+.category-chips button,
+.type-chips button {
+  background: #e2e8f0;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.category-chips button.active,
+.type-chips button.active {
+  background: #3b82f6;
+  color: #fff;
+}

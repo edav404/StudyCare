@@ -79,6 +79,19 @@
     </form>
   </div>
 
+    <!-- Tarjeta de acceso rápido a Pomodoro -->
+  <div class="max-w-md mx-auto my-4">
+    <a routerLink="/pomodoro" class="group block bg-white rounded-xl shadow-md p-4 flex items-center gap-4 hover:shadow-2xl transform hover:-translate-y-1 transition">
+      <div class="w-12 h-12 flex items-center justify-center bg-blue-50 rounded-lg text-2xl">🕒</div>
+      <div>
+        <div class="text-sm text-gray-500">Modo</div>
+        <div class="text-lg font-semibold text-gray-800">Reloj Pomodoro</div>
+        <div class="text-xs text-gray-500 mt-1">25 min enfocado • 5 min descanso</div>
+      </div>
+      <div class="ml-auto text-sm text-blue-600 group-hover:underline">Abrir</div>
+    </a>
+  </div>
+
   <!-- Lista de tareas por categoría -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 px-6 mb-6">
     <div *ngFor="let category of categories">

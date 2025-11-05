@@ -1,0 +1,74 @@
+<div class="p-6 min-h-screen bg-gray-50">
+  <h1 class="text-2xl font-bold text-blue-700 mb-4">Recursos de Bienestar y Estudio</h1>
+  <p class="text-gray-600 mb-6">
+    Explora meditaciones, técnicas, música y artículos para tu bienestar académico y mental.
+  </p>
+
+  <!-- Filtros -->
+  <div class="filters">
+    <div class="category-chips flex flex-wrap gap-3 mb-4">
+      <div class="flex gap-2 overflow-x-auto pb-2">
+        <span class="font-semibold text-gray-700 mr-2">Categoría:</span>
+        <button
+          *ngFor="let cat of categories"
+          (click)="filterByCategory(cat)"
+          [class.active]="activeCategory === cat"
+          class="category-chip border border-blue-500 text-blue-600 px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-100 whitespace-nowrap transition"
+        >
+          {{ cat }}
+        </button>
+      </div>
+    </div>
+
+    <div class="type-chips flex flex-wrap gap-3 mb-6">
+      <div class="flex gap-2 overflow-x-auto pb-2">
+        <span class="font-semibold text-gray-700 mr-2">Tipo:</span>
+        <button
+          *ngFor="let t of types"
+          (click)="filterByType(t)"
+          [class.active]="activeType === t"
+          class="type-chip border border-green-500 text-green-600 px-4 py-1 rounded-full text-sm font-semibold hover:bg-green-100 whitespace-nowrap transition"
+        >
+          {{ t | titlecase }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de recursos -->
+  <!-- Estado: cargando / error / vacío -->
+  <div *ngIf="loading" class="py-8 text-center text-gray-600">Cargando recursos...</div>
+
+  <div *ngIf="!loading && errorMessage" class="py-8 text-center text-red-600">
+    <p>{{ errorMessage }}</p>
+    <button (click)="loadResources()" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded">Reintentar</button>
+  </div>
+
+  <div *ngIf="!loading && !errorMessage && filtered.length === 0" class="py-8 text-center text-gray-600">No hay recursos para mostrar.</div>
+
+  <div *ngIf="!loading && !errorMessage && filtered.length > 0" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      *ngFor="let res of filtered"
+      class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
+    >
+      <img [src]="res.thumbnail" alt="" class="w-full h-40 object-cover">
+      <div class="p-4">
+        <div class="flex justify-between items-start">
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">{{ res.title }}</h2>
+          <button class="favorite-btn" (click)="toggleFavorite(res)" aria-label="Marcar favorito">
+            <span [class.active]="res.favorite">{{ res.favorite ? '★' : '☆' }}</span>
+          </button>
+        </div>
+
+        <p class="text-gray-500 text-sm mb-3">{{ res.description }}</p>
+        <a
+          [href]="res.url"
+          target="_blank"
+          class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg"
+        >
+          Ver {{ res.type === 'video' ? 'video ▶️' : res.type === 'article' ? 'artículo 📖' : 'guía 🎧' }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
