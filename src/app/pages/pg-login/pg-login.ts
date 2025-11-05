@@ -9,21 +9,32 @@ import { UserService } from '../../services/user.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './pg-login.html',
-  styleUrl: './pg-login.css'
+  styleUrl: './pg-login.css',
 })
 export class PgLogin {
-  email = '';
-  password = '';
-  mensaje = '';
+  correo: string = '';
+  password: string = '';
+  mensaje: string = '';
+  error: boolean = false;
 
   constructor(private userService: UserService, private router: Router) {}
 
-  login() {
-    const ok = this.userService.login(this.email, this.password);
-    if (ok) {
-      this.router.navigate(['/editar-perfil']);
+  iniciarSesion() {
+    if (!this.correo || !this.password) {
+      this.mensaje = 'Por favor, ingrese su correo y contraseña.';
+      this.error = true;
+      return;
+    }
+
+    const logged = this.userService.login(this.correo, this.password);
+
+    if (logged) {
+      this.mensaje = 'Inicio de sesión exitoso ✅';
+      this.error = false;
+      setTimeout(() => this.router.navigate(['/inicio']), 1000);
     } else {
-      this.mensaje = 'Correo o contraseña incorrectos';
+      this.mensaje = 'Correo o contraseña incorrectos, o usuario inactivo.';
+      this.error = true;
     }
   }
 }

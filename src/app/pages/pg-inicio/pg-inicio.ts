@@ -1,23 +1,37 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-pg-inicio',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './pg-inicio.html',
   styleUrl: './pg-inicio.css',
 })
-export class PgInicio {
- protected readonly title = signal('ng-tw-4-app');
-  userName = 'Samuel';
+export class PgInicio implements OnInit {
+  protected readonly title = signal('ng-tw-4-app');
+  userName = '';
   categories = [
     { name: 'Académico', completed: 0, total: 5, color: 'blue' },
     { name: 'Físico', completed: 0, total: 5, color: 'green' },
     { name: 'Mental', completed: 0, total: 5, color: 'purple' },
   ];
-  //dynamic classes based on category color
+
+  constructor(private userService: UserService, private router: Router) {}
+
+  ngOnInit(): void {
+    const user = this.userService.getCurrentUser();
+
+    if (user) {
+      this.userName = user.nombre;
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
+
   getClass(color: string): any {
     return {
       ['bg-' + color + '-100']: true,
@@ -25,22 +39,22 @@ export class PgInicio {
     };
   }
 
-  //increment task completion
   addTask(cat: any) {
     if (cat.completed < cat.total) {
       cat.completed++;
     }
   }
-  //calculate overall progress
+
   getProgressPercent(): number {
     const totalTasks = this.categories.reduce((sum, cat) => sum + cat.total, 0);
     const completedTasks = this.categories.reduce((sum, cat) => sum + cat.completed, 0);
     return totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
   }
+
   get progressPercent(): number {
     return this.getProgressPercent();
   }
-  //dynamic progress message
+
   getProgressMessage(): string {
     const percent = this.getProgressPercent();
 

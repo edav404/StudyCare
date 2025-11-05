@@ -9,28 +9,38 @@ import { UserService } from '../../services/user.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './pg-registrar.html',
-  styleUrl: './pg-registrar.css'
+  styleUrl: './pg-registrar.css',
 })
 export class PgRegistrar {
-  nombre = '';
-  email = '';
-  password = '';
-  mensaje = '';
+  nombre: string = '';
+  correo: string = '';
+  password: string = '';
+
+  mensaje: string = '';
+  error: boolean = false;
 
   constructor(private userService: UserService, private router: Router) {}
 
   registrar() {
-    const exito = this.userService.register({
+    if (!this.nombre || !this.correo || !this.password) {
+      this.mensaje = 'Por favor, complete todos los campos.';
+      this.error = true;
+      return;
+    }
+
+    const registrado = this.userService.register({
       nombre: this.nombre,
-      email: this.email,
-      password: this.password
+      correo: this.correo,
+      password: this.password,
     });
 
-    if (exito) {
-      this.mensaje = 'Registro exitoso. Inicia sesión.';
-      setTimeout(() => this.router.navigate(['/login']), 1000);
+    if (registrado) {
+      this.mensaje = 'Registro exitoso 🎉 Redirigiendo al login...';
+      this.error = false;
+      setTimeout(() => this.router.navigate(['/login']), 1500);
     } else {
       this.mensaje = 'Este correo ya está registrado.';
+      this.error = true;
     }
   }
 }

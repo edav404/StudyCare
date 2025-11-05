@@ -22,7 +22,7 @@ export class Navbar {
   }
 
   goHome() {
-    this.router.navigate(['/']);
+    this.router.navigate(['/inicio']);
   }
 
   goToProfile() {
