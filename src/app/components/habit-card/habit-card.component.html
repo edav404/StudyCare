@@ -1,0 +1,14 @@
+<div
+  (click)="onSelect()"
+  class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm cursor-pointer transition hover:shadow-md"
+  [class.bg-green-100]="habit.completed"
+>
+  <div class="flex items-center gap-3">
+    <span class="text-2xl">{{ habit.icon }}</span>
+    <div>
+      <h2 class="font-semibold text-gray-800">{{ habit.name }}</h2>
+      <p class="text-gray-500 text-sm">{{ habit.description }}</p>
+    </div>
+  </div>
+  <span *ngIf="habit.completed" class="text-green-600 text-lg font-bold">✔</span>
+</div>
