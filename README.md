@@ -1,6 +1,6 @@
 # 🎓 StudyCare
 
-**StudyCare** es una aplicación web construida con **Angular (v20)** y **TailwindCSS**, diseñada para ayudar a los estudiantes a equilibrar su productividad y bienestar.  
+**StudyCare** es una aplicación web construida con **Angular (v20)**, diseñada para ayudar a los estudiantes a equilibrar su productividad y bienestar.  
 Incluye módulos de **Pomodoro**, **hábitos saludables**, **recursos de relajación**, **estados de ánimo** y un sistema de usuario básico (persistente en *localStorage*).
 
 ---
@@ -17,6 +17,7 @@ Incluye módulos de **Pomodoro**, **hábitos saludables**, **recursos de relajac
 
 ## 🧩 Estructura general del proyecto
 
+```
 src/
 ├── app/
 │ ├── app.ts # Componente raíz (standalone)
@@ -33,7 +34,7 @@ src/
 │ └── navbar-bottom/ # Barra de navegación inferior
 ├── assets/data/recursos.json # Datos locales de recursos
 ├── styles.css # Estilos globales y Tailwind
-
+```
 
 ---
 
@@ -95,10 +96,24 @@ Los datos se almacenan en **LocalStorage** bajo claves predefinidas:
 ### 2️⃣ Instalación
 ```bash
 npm install
+```
 
 ### 3️⃣ Modo desarrollo
 ```bash
 npm install
+```
 
-Visita http://localhost:4200
+## 🪲 Problemas frecuentes
 
+Los datos se almacenan en **LocalStorage** bajo claves predefinidas:
+
+| Error | Solución |
+|--------|------------|
+| `Página en blanco o redirección` | Verifica rutas en `app.routes.ts` |
+| `Recursos no cargan` | Confirma que `recursos.json` está en `/assets/data` |
+| `Favoritos no se guardan` | Revisa la clave `studycare_favorites` en LocalStorage |
+
+## 🪲 Licencia
+
+Este proyecto se distribuye bajo la licencia MIT.
+Desarrollado por el equipo StudyCare.
