@@ -76,7 +76,6 @@ tipsByMood: Record<Mood, Tip[]> = {
       description: 'Ve a dar un paseo al aire libre para despejar tu mente.'
     }
   ],
-
   Mal: [
     {
       iconPath: '/assets/stretching.svg',
