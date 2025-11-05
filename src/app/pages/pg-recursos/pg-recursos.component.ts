@@ -7,7 +7,7 @@ interface Resource {
   title: string;
   description: string;
   category: string;
-  type: 'Video' | 'Artículo' | 'Guía';
+  type: string; // normalizamos a string lowercase en tiempo de ejecución
   url: string;
   thumbnail: string;
   favorite?: boolean;
@@ -42,12 +42,12 @@ export class PgRecursosComponent implements OnInit {
   loadResources() {
     this.loading = true;
     this.errorMessage = null;
-    this.http.get<Resource[]>('assets/data/recursos.json').subscribe({
+    this.http.get<Resource[]>('/assets/data/recursos.json').subscribe({
       next: (data) => {
-        this.resources = (data || []).map(r => ({ ...r, favorite: false }));
+        this.resources = (data || []).map(r => ({ ...r, favorite: false, type: (r.type || '').toString().toLowerCase() }));
         // cargar favoritos guardados
         this.loadFavoritesFromStorage();
-        this.filtered = [...this.resources];
+        this.filterResources();
         this.loading = false;
       },
       error: (err) => {
