@@ -1,0 +1,59 @@
+<div class="flex justify-center items-center min-h-screen bg-blue-50">
+  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
+    <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">
+      Editar Perfil
+    </h1>
+
+    <form (ngSubmit)="guardarCambios()" class="flex flex-col gap-4">
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Nombre</label>
+        <input
+          type="text"
+          [(ngModel)]="nombre"
+          name="nombre"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        />
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Correo</label>
+        <input
+          type="email"
+          [(ngModel)]="correo"
+          name="correo"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        />
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-medium mb-1">Contraseña</label>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="mt-4 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+      >
+        Guardar cambios
+      </button>
+    </form>
+
+    <div *ngIf="mensaje" class="mt-4 text-center">
+      <p [ngClass]="error ? 'text-red-500' : 'text-green-600'">{{ mensaje }}</p>
+    </div>
+
+    <div class="text-center mt-6">
+      <button
+        (click)="cerrarSesion()"
+        class="text-sm text-red-600 hover:underline"
+      >
+        Cerrar sesión
+      </button>
+    </div>
+  </div>
+</div>

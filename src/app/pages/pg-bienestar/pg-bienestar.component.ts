@@ -16,7 +16,7 @@ interface Habit {
   standalone: true,
   imports: [CommonModule, FormsModule, HabitCardComponent],
   templateUrl: './pg-bienestar.component.html',
-  styleUrls: ['./pg-bienestar.component.css']
+  styleUrls: []
 })
 export class PgBienestarComponent implements OnInit {
   habits: Habit[] = [];

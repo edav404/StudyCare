@@ -1,10 +1,14 @@
 <nav class="flex items-center justify-between bg-white px-6 py-3 shadow">
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2 cursor-pointer" (click)="goHome()">
     <img src="assets/studycare.png" alt="Logo" class="w-8 h-8" />
-    <span class="text-xl font-bold text-blue-700"><a href="/src/app/app.html">StudyCare</a></span>
+    <span class="text-xl font-bold text-blue-700">StudyCare</span>
   </div>
-  <div>
-    <img src="assets/user-svgrepo-com.svg" alt="User" class="w-8 h-8 rounded-full" />
+
+  <div *ngIf="showUserIcon" (click)="goToProfile()" class="cursor-pointer">
+    <img
+      src="assets/user-svgrepo-com.svg"
+      alt="User"
+      class="w-8 h-8 rounded-full hover:scale-110 transition-transform"
+    />
   </div>
-  
 </nav>

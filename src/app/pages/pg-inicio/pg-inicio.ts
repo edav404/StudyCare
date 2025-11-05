@@ -1,57 +1,118 @@
-import { Component } from '@angular/core';
-import { signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
 
+// Definir la interfaz Task
+export interface Task {
+  id: string;
+  title: string;
+  category: 'academico' | 'fisico' | 'mental';
+  completed: boolean;
+}
 
 @Component({
   selector: 'app-pg-inicio',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './pg-inicio.html',
   styleUrl: './pg-inicio.css',
 })
-export class PgInicio {
- protected readonly title = signal('ng-tw-4-app');
-  userName = 'Samuel';
-  categories = [
-    { name: 'Académico', completed: 0, total: 5, color: 'blue' },
-    { name: 'Físico', completed: 0, total: 5, color: 'green' },
-    { name: 'Mental', completed: 0, total: 5, color: 'purple' },
-  ];
-  //dynamic classes based on category color
-  getClass(color: string): any {
+export class PgInicio implements OnInit {
+  protected readonly title = signal('ng-tw-4-app');
+  userName = '';
+
+  readonly categories = ['academico', 'fisico', 'mental'] as const;
+
+  newTaskTitle = '';
+  newTaskCategory: Task['category'] = 'academico';
+
+  tasks: Task[] = [];
+
+  // Colores por categoría
+  categoryColors: Record<Task['category'], string> = {
+    academico: 'blue',
+    fisico: 'green',
+    mental: 'purple',
+  };
+
+  constructor(private userService: UserService, private router: Router) {}
+
+  // 🔹 Cargar usuario y tareas al iniciar
+  ngOnInit(): void {
+    const user = this.userService.getCurrentUser();
+    if (user) {
+      this.userName = user.nombre;
+    } else {
+      this.router.navigate(['/login']);
+    }
+
+    this.loadTasksFromLocalStorage();
+  }
+
+  // 🔹 Clases dinámicas según categoría
+  getClass(category: Task['category']): any {
+    const color = this.categoryColors[category];
     return {
       ['bg-' + color + '-100']: true,
       ['text-' + color + '-600']: true,
     };
   }
 
-  //increment task completion
-  addTask(cat: any) {
-    if (cat.completed < cat.total) {
-      cat.completed++;
+  // 🔹 Añadir tarea
+  addTask(title: string, category: Task['category']) {
+    if (!title.trim()) return;
+    const newTask: Task = {
+      id: crypto.randomUUID(),
+      title,
+      category,
+      completed: false,
+    };
+    this.tasks.push(newTask);
+    this.saveTasksToLocalStorage();
+    this.newTaskTitle = '';
+  }
+
+  // 🔹 Guardar en localStorage
+  saveTasksToLocalStorage(): void {
+    localStorage.setItem('studycare_tasks', JSON.stringify(this.tasks));
+  }
+
+  // 🔹 Cargar desde localStorage
+  loadTasksFromLocalStorage(): void {
+    const stored = localStorage.getItem('studycare_tasks');
+    if (stored) {
+      this.tasks = JSON.parse(stored);
     }
   }
-  //calculate overall progress
+
+  // 🔹 Agrupar tareas por categoría
+  get tasksByCategory(): Record<string, Task[]> {
+    return this.tasks.reduce((acc, task) => {
+      acc[task.category] = acc[task.category] || [];
+      acc[task.category].push(task);
+      return acc;
+    }, {} as Record<string, Task[]>);
+  }
+
+  // 🔹 Calcular progreso total
   getProgressPercent(): number {
-    const totalTasks = this.categories.reduce((sum, cat) => sum + cat.total, 0);
-    const completedTasks = this.categories.reduce((sum, cat) => sum + cat.completed, 0);
+    const totalTasks = this.tasks.length;
+    const completedTasks = this.tasks.filter((t) => t.completed).length;
     return totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
   }
+
   get progressPercent(): number {
     return this.getProgressPercent();
   }
-  //dynamic progress message
+
+  // 🔹 Mensaje dinámico de progreso
   getProgressMessage(): string {
     const percent = this.getProgressPercent();
-
-    if (percent === 100) {
-      return '¡Excelente trabajo, día completado!';
-    } else if (percent >= 70) {
-      return '¡Casi lo logras, no te detengas!';
-    } else if (percent >= 31) {
-      return '¡Sigue así, vas por buen camino!';
-    } else {
-      return '¡Vamos, apenas estás empezando!';
-    }
+    if (percent === 100) return '¡Excelente trabajo, día completado!';
+    if (percent >= 70) return '¡Casi lo logras, no te detengas!';
+    if (percent >= 31) return '¡Sigue así, vas por buen camino!';
+    return '¡Vamos, apenas estás empezando!';
   }
 }
