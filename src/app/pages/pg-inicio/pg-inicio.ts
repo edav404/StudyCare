@@ -37,6 +37,18 @@ export class PgInicio implements OnInit {
     mental: 'purple',
   };
 
+  navItems = [
+    { path: '/inicio', label: 'Inicio', icon: '🏠' },
+    { path: '/estados-animo', label: 'Ánimo', icon: '😊' },
+    { path: '/asignaturas', label: 'Asignaturas', icon: '📘' },
+    { path: '/recursos', label: 'Recursos', icon: '📚' },
+    { path: '/recordatorios', label: 'Recordatorios', icon: '⏰' },
+  ];
+
+  isActive(path: string): boolean {
+    return this.router.url === path;
+  }
+
   constructor(private userService: UserService, private router: Router) {}
 
   // 🔹 Cargar usuario y tareas al iniciar

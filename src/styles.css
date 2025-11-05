@@ -17,5 +17,5 @@
 /* Dejar espacio en la parte inferior para la barra de navegación fija */
 html, body {
   /* 64px de altura de la navbar + espacio extra; usar safe-area para móviles */
-  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(0px + env(safe-area-inset-bottom, 0px));
 }

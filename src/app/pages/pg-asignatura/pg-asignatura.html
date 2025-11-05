@@ -1,0 +1,256 @@
+<div class="flex flex-col md:flex-row min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50">
+  <aside
+    class="w-64 bg-white shadow-lg md:flex flex-col justify-between hidden z-30"
+  >
+    <div class="py-6">
+      <nav>
+        <ul class="flex flex-col justify-around w-full px-4 gap-3">
+          <li
+            *ngFor="let item of navItems"
+            class="flex-1 text-center border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:scale-[0.97] transition-all duration-300"
+          >
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="flex flex-col items-center py-3 text-gray-600 text-sm font-medium hover:text-blue-600 transition"
+            >
+              <span
+                class="text-2xl mb-1 transition-transform duration-200"
+                [ngClass]="{ 'scale-110 text-blue-600': isActive(item.path) }"
+              >
+                {{ item.icon }}
+              </span>
+              <span
+                [ngClass]="{
+                  'text-blue-600 font-semibold': isActive(item.path),
+                  'text-gray-500': !isActive(item.path)
+                }"
+              >
+                {{ item.label }}
+              </span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="p-5 text-center border-t border-gray-100 text-gray-400 text-xs">
+      © 2025 StudyCare
+    </div>
+  </aside>
+
+  <main
+    class="flex-1 overflow-y-auto px-6 py-8 md:px-10 md:py-10 transition-all duration-300"
+  >
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <h2 class="text-2xl font-bold text-gray-800">📘 Mis Asignaturas</h2>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <select
+          [(ngModel)]="filtroSemestre"
+          (change)="filtrarPorSemestre()"
+          class="border border-gray-300 rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-400 outline-none"
+        >
+          <option value="Todos">Todos los semestres</option>
+          <option *ngFor="let s of semestres" [value]="s">{{ s }}</option>
+        </select>
+
+        <button
+          (click)="openCreateModal()"
+          class="bg-blue-500 text-white px-4 py-2 rounded-xl font-medium hover:bg-blue-600 transition-all shadow-sm"
+        >
+          + Nueva asignatura
+        </button>
+      </div>
+    </div>
+
+    <!-- 🔹 Lista de asignaturas -->
+    <div
+      *ngIf="asignaturasFiltradas.length; else noAsignaturas"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"
+    >
+      <div
+        *ngFor="let a of asignaturasFiltradas"
+        class="bg-white/70 backdrop-blur-md border border-gray-100 rounded-2xl shadow-sm p-4 flex flex-col justify-between transition hover:shadow-md"
+      >
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ a.nombre }}</h3>
+          <p class="text-sm text-gray-500">Semestre: {{ a.semestre }}</p>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between">
+          <span class="text-blue-600 font-semibold text-lg">{{ a.calificacionFinal || 0 }}/5.0</span>
+          <div class="flex gap-2">
+            <button
+              (click)="openDetailModal(a)"
+              class="text-gray-600 hover:text-blue-500 transition"
+              title="Ver detalles"
+            >
+              🔍
+            </button>
+            <button
+              (click)="eliminarAsignatura(a)"
+              class="text-gray-500 hover:text-red-500 transition"
+              title="Eliminar"
+            >
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noAsignaturas>
+      <div class="text-center text-gray-500 py-20">
+        <p class="text-lg">Aún no tienes asignaturas registradas.</p>
+        <p class="text-sm mt-2">Presiona “+ Nueva asignatura” para empezar.</p>
+      </div>
+    </ng-template>
+  </main>
+
+  <!-- 🔹 Modal: Crear Asignatura -->
+  <div
+    *ngIf="showCreateModal"
+    class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">Nueva Asignatura</h3>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-sm text-gray-600">Nombre</label>
+          <input
+            type="text"
+            [(ngModel)]="nuevaAsignatura.nombre"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="text-sm text-gray-600">Semestre</label>
+          <select
+            [(ngModel)]="nuevaAsignatura.semestre"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-400 outline-none"
+          >
+            <option *ngFor="let s of semestres" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button
+          (click)="closeModals()"
+          class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="crearAsignatura()"
+          class="px-4 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition"
+        >
+          Crear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔹 Modal: Detalle Asignatura -->
+  <div
+    *ngIf="showDetailModal && selectedAsignatura"
+    class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-2xl p-6 w-full max-w-2xl shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">
+          {{ selectedAsignatura.nombre }} ({{ selectedAsignatura.semestre }})
+        </h3>
+        <button (click)="closeModals()" class="text-gray-500 hover:text-red-500 transition text-lg">
+          ✖
+        </button>
+      </div>
+
+      <div class="mb-4">
+        <p class="text-sm text-gray-600">
+          Calificación final:
+          <span class="font-semibold text-blue-600">{{ selectedAsignatura.calificacionFinal }}/5.0</span>
+        </p>
+      </div>
+
+      <hr class="my-3" />
+
+      <!-- Lista de notas -->
+      <div class="space-y-3">
+        <h4 class="font-medium text-gray-700 mb-2">Notas</h4>
+
+        <div
+          *ngFor="let n of selectedAsignatura.notas; let i = index"
+          class="flex justify-between items-center border border-gray-100 rounded-xl p-3 hover:bg-gray-50"
+        >
+          <div>
+            <p class="font-medium text-gray-800">{{ n.nombre }}</p>
+            <p class="text-sm text-gray-500">
+              Calificación: {{ n.calificacion }} — Peso: {{ n.porcentaje }}%
+            </p>
+          </div>
+          <button
+            (click)="eliminarNota(i)"
+            class="text-gray-500 hover:text-red-500 transition"
+            title="Eliminar nota"
+          >
+            🗑️
+          </button>
+        </div>
+
+        <!-- 🔹 Agregar nota -->
+        <div class="mt-5 p-3 border-t border-gray-100">
+          <h5 class="font-semibold text-gray-700 mb-2">Agregar nota</h5>
+          <div class="grid grid-cols-12 gap-2 items-end">
+            <div class="col-span-4">
+              <label class="text-xs text-gray-500 block mb-1">Nombre</label>
+              <input
+                type="text"
+                placeholder="Ej: Parcial"
+                [(ngModel)]="nuevaNota.nombre"
+                class="w-full border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-400 outline-none"
+              />
+            </div>
+
+            <div class="col-span-3">
+              <label class="text-xs text-gray-500 block mb-1">Calificación (0–5)</label>
+              <input
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                [(ngModel)]="nuevaNota.calificacion"
+                class="w-full border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-400 outline-none"
+              />
+            </div>
+
+            <div class="col-span-3">
+              <label class="text-xs text-gray-500 block mb-1">% Peso</label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                [(ngModel)]="nuevaNota.porcentaje"
+                class="w-full border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-400 outline-none"
+              />
+            </div>
+
+            <div class="col-span-2 flex justify-center">
+              <button
+                (click)="agregarNota()"
+                class="bg-green-500 text-white rounded-full w-9 h-9 flex items-center justify-center text-lg hover:bg-green-600 transition"
+                title="Agregar nota"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

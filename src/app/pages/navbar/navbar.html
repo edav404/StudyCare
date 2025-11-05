@@ -1,10 +1,11 @@
-<nav class="flex items-center justify-between bg-white px-6 py-3 shadow">
+
+<nav class="flex items-center justify-between bg-white px-6 py-3 shadow relative min-h-[6vh]">
   <div class="flex items-center gap-2 cursor-pointer" (click)="goHome()">
     <img src="assets/studycare.png" alt="Logo" class="w-8 h-8" />
     <span class="text-xl font-bold text-blue-700">StudyCare</span>
   </div>
 
-  <div *ngIf="showUserIcon" (click)="goToProfile()" class="cursor-pointer">
+  <div *ngIf="showUserIcon" (click)="toggleSidebar()" class="cursor-pointer relative">
     <img
       src="assets/user-svgrepo-com.svg"
       alt="User"
@@ -12,3 +13,16 @@
     />
   </div>
 </nav>
+
+<div
+  *ngIf="showSidebar"
+  class="fixed inset-0 bg-black/10 bg-opacity-40 flex justify-end z-50"
+  (click)="closeSidebar()"
+>
+  <div
+    class="bg-white w-80 sm:w-96 h-full shadow-lg p-6 overflow-y-auto"
+    (click)="$event.stopPropagation()"
+  >
+    <app-editar-perfil-sidebar (cerrar)="closeSidebar()"></app-editar-perfil-sidebar>
+  </div>
+</div>

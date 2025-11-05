@@ -1,13 +1,30 @@
-<nav class="navbar-bottom">
-  <ul>
-    <li *ngFor="let item of navItems">
+<!-- Navbar inferior (visible solo en móviles) -->
+<nav
+  class="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 flex justify-center items-center z-50 md:hidden shadow-sm"
+>
+  <ul class="flex justify-around w-full max-w-md px-2">
+    <li *ngFor="let item of navItems" class="flex-1 text-center">
       <a
         [routerLink]="item.path"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
+        class="flex flex-col items-center text-slate-500 text-xs py-1 transition duration-200 hover:text-blue-500"
       >
-        <span class="icon">{{ item.icon }}</span>
-        <span class="label">{{ item.label }}</span>
+        <span
+          class="icon text-lg mb-1 transition-transform duration-200"
+          [ngClass]="{ 'scale-110 text-blue-500': isActive(item.path) }"
+        >
+          {{ item.icon }}
+        </span>
+        <span
+          class="label font-medium"
+          [ngClass]="{
+            'text-blue-600 font-semibold': isActive(item.path),
+            'text-slate-500': !isActive(item.path)
+          }"
+        >
+          {{ item.label }}
+        </span>
       </a>
     </li>
   </ul>

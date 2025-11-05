@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StudyCare — Recordatorio postura</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:16px;color:#111}
+    .card{border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+    label{display:block;margin-top:8px}
+    input,select{padding:8px;width:100%;box-sizing:border-box;margin-top:6px;border-radius:6px;border:1px solid #ccc}
+    button{padding:10px 14px;border-radius:8px;border:0;background:#0b79d0;color:white;cursor:pointer;margin-right:8px}
+    small{color:#666}
+    #log{white-space:pre-wrap;background:#f9f9f9;padding:8px;border-radius:6px;height:120px;overflow:auto;border:1px solid #eee}
+    footer{margin-top:14px;font-size:13px;color:#666}
+    .row{display:flex;gap:8px}
+    .col{flex:1}
+  </style>
+</head>
+<body>
+  <h1>Recordatorio de postura — StudyCare</h1>
+
+  <div class="card">
+    <h3>Configuración</h3>
+    <label>Intervalo (minutos)
+      <input id="interval" type="number" min="1" value="30">
+    </label>
+
+    <div class="row">
+      <div class="col">
+        <label>Hora inicio
+          <input id="startTime" type="time" value="08:00">
+        </label>
+      </div>
+      <div class="col">
+        <label>Hora fin
+          <input id="endTime" type="time" value="22:00">
+        </label>
+      </div>
+    </div>
+
+    <label>Días activos
+      <select id="days" multiple size="7" style="height:140px">
+        <option value="1">Lunes</option>
+        <option value="2">Martes</option>
+        <option value="3">Miércoles</option>
+        <option value="4">Jueves</option>
+        <option value="5">Viernes</option>
+        <option value="6">Sábado</option>
+        <option value="0">Domingo</option>
+      </select>
+      <small>Selecciona con Ctrl/Cmd + clic</small>
+    </label>
+
+    <label>
+      <input id="enableSound" type="checkbox"> Activar sonido con la notificación
+    </label>
+
+    <div style="margin-top:12px">
+      <button id="saveBtn">Guardar y activar recordatorios</button>
+      <button id="stopBtn" style="background:#e04b4b">Detener</button>
+      <button id="testBtn" style="background:#2e8540">Probar notificación</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Consejos rápidos (ergonomía)</h3>
+    <ul id="tipsList">
+      
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Registro / Logs</h3>
+    <div id="log">Sin actividad aún.</div>
+  </div>
+
+  <footer>
+    <small>Nota: Para recibir notificaciones cuando la página esté cerrada necesitas implementar un servidor y Push API (esqueleto incluido en el service worker).</small>
+  </footer>
+
+  <script>
+  
+  const postureTips = [
+    "Alinea tus orejas con tus hombros; evita encorvar el cuello.",
+    "Pies apoyados en el suelo; rodillas en 90°.",
+    "Pantalla a la altura de los ojos (o un poco abajo) para evitar inclinar el cuello.",
+    "Usa un soporte lumbar o una toalla enrollada para mantener la curvatura natural.",
+    "Toma un descanso corto: 1–2 min de estiramiento cada 30–45 min.",
+    "Ajusta la iluminación para evitar forzar la vista.",
+    "Si estudias mucho, alterna posiciones (sentado/de pie) cada cierto tiempo."
+  ];
+
+  
+  const intervalInput = document.getElementById('interval');
+  const startTimeInput = document.getElementById('startTime');
+  const endTimeInput = document.getElementById('endTime');
+  const daysSelect = document.getElementById('days');
+  const saveBtn = document.getElementById('saveBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const testBtn = document.getElementById('testBtn');
+  const logEl = document.getElementById('log');
+  const tipsList = document.getElementById('tipsList');
+  const enableSound = document.getElementById('enableSound');
+
+  
+  postureTips.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    tipsList.appendChild(li);
+  });
+
+  
+  let scheduler = null; 
+  let lastTipIndex = -1;
+
+  
+  function appLog(msg) {
+    const time = new Date().toLocaleString();
+    if (logEl.textContent === 'Sin actividad aún.') logEl.textContent = '';
+    logEl.textContent = `${time} — ${msg}\n` + logEl.textContent;
+  }
+
+  
+  function getSelectedDays() {
+    return Array.from(daysSelect.selectedOptions).map(o => parseInt(o.value));
+  }
+
+  function isWithinSchedule(startTime, endTime, activeDays) {
+    const now = new Date();
+    const today = now.getDay(); // 0 dom ... 6 sab
+    if (!activeDays.includes(today)) return false;
+
+
+    const [sh, sm] = startTime.split(':').map(Number);
+    const [eh, em] = endTime.split(':').map(Number);
+    const startMins = sh*60 + sm;
+    const endMins = eh*60 + em;
+    const nowMins = now.getHours()*60 + now.getMinutes();
+    if (startMins <= endMins) {
+      return nowMins >= startMins && nowMins <= endMins;
+    } else {
+     
+      return nowMins >= startMins || nowMins <= endMins;
+    }
+  }
+
+  
+  function getNextTip() {
+    let idx = Math.floor(Math.random() * postureTips.length);
+    if (idx === lastTipIndex) idx = (idx + 1) % postureTips.length;
+    lastTipIndex = idx;
+    return postureTips[idx];
+  }
+
+  async function showLocalNotification(title, body) {
+    if (!("Notification" in window)) {
+      appLog("El navegador no soporta Notifications API");
+      return;
+    }
+    if (Notification.permission !== "granted") {
+      appLog("Permiso de notificaciones no concedido");
+      return;
+    }
+
+    
+    if (enableSound.checked) {
+      try {
+        const beep = new Audio("data:audio/mp3;base64,//uQZAAAAAAAAAAAA..."); 
+        beep.play().catch(()=>{});
+      } catch(e){}
+    }
+
+   
+    const n = new Notification(title, {
+      body,
+      icon: "" 
+    });
+
+   
+    n.onclick = () => {
+      window.focus();
+      appLog("Usuario hizo click en la notificación.");
+    };
+  }
+
+  
+  function startScheduler(config) {
+    stopScheduler();
+    const minutes = Math.max(1, Number(config.interval));
+    appLog(`Scheduler iniciado: cada ${minutes} min entre ${config.startTime} y ${config.endTime} en días ${config.days.join(',')}`);
+    
+    const tick = async () => {
+      if (isWithinSchedule(config.startTime, config.endTime, config.days)) {
+        const tip = getNextTip();
+        await showLocalNotification("Postura — StudyCare", tip);
+        appLog("Notificación enviada: " + tip);
+      } else {
+        appLog("Fuera del horario/día configurado. No se envía recordatorio.");
+      }
+    };
+    
+    tick();
+    scheduler = setInterval(tick, minutes * 60 * 1000);
+    
+  }
+
+  function stopScheduler() {
+    if (scheduler) {
+      clearInterval(scheduler);
+      scheduler = null;
+      appLog("Scheduler detenido.");
+    }
+  }
+
+  
+  function saveConfig() {
+    const cfg = {
+      interval: intervalInput.value,
+      startTime: startTimeInput.value,
+      endTime: endTimeInput.value,
+      days: getSelectedDays(),
+      enableSound: enableSound.checked
+    };
+    localStorage.setItem('postureConfig', JSON.stringify(cfg));
+    appLog("Configuración guardada.");
+    return cfg;
+  }
+
+  function loadConfig() {
+    const raw = localStorage.getItem('postureConfig');
+    if (!raw) return null;
+    try {
+      const c = JSON.parse(raw);
+      intervalInput.value = c.interval || 30;
+      startTimeInput.value = c.startTime || "08:00";
+      endTimeInput.value = c.endTime || "22:00";
+      enableSound.checked = !!c.enableSound;
+      
+      Array.from(daysSelect.options).forEach(opt => {
+        opt.selected = c.days && c.days.includes(Number(opt.value));
+      });
+      return c;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  
+  async function requestPermissionsAndSW() {
+    if (!('Notification' in window)) {
+      appLog("Este navegador no soporta notificaciones.");
+      return false;
+    }
+
+    let perm = Notification.permission;
+    if (perm !== "granted") {
+      perm = await Notification.requestPermission();
+    }
+
+    if (perm === "granted") {
+      appLog("Permiso de notificaciones concedido.");
+    } else {
+      appLog("Permiso de notificaciones denegado o pendiente.");
+      return false;
+    }
+
+    
+    if ('serviceWorker' in navigator) {
+      try {
+        const reg = await navigator.serviceWorker.register('sw.js');
+        appLog("Service Worker registrado: " + reg.scope);
+        
+      } catch (err) {
+        appLog("Error registrando Service Worker: " + err);
+      }
+    } else {
+      appLog("Service Worker no soportado.");
+    }
+    return true;
+  }
+
+  
+  saveBtn.addEventListener('click', async () => {
+    const granted = await requestPermissionsAndSW();
+    const cfg = saveConfig();
+    if (granted) {
+      startScheduler(cfg);
+    } else {
+      appLog("No se inició scheduler porque no hay permisos.");
+    }
+  });
+
+  stopBtn.addEventListener('click', () => {
+    stopScheduler();
+    appLog("Usuario detuvo recordatorios.");
+  });
+
+  testBtn.addEventListener('click', async () => {
+    await requestPermissionsAndSW();
+    const tip = getNextTip();
+    await showLocalNotification("Prueba — Postura", tip);
+    appLog("Notificación de prueba enviada.");
+  });
+
+  
+  window.addEventListener('load', () => {
+    const c = loadConfig();
+    if (c) {
+      appLog("Configuración cargada desde localStorage.");
+      
+      if (Notification.permission === "granted") {
+        startScheduler(c);
+      } else {
+        appLog("No se inició scheduler automáticamente: permisos de notificación no concedidos.");
+      }
+    } else {
+      appLog("Sin configuración previa.");
+    }
+  });
+  </script>
+</body>
+</html>
